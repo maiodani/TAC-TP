@@ -170,12 +170,18 @@ AVATAR	PROC
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
 	
 
-CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
+CICLO:		goto_xy	1,1
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		bh,0			; numero da p�gina
+			int		10h	
+			mov paredecar,al
+			
+			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h
 			mov		bh,0			; numero da p�gina
 			int		10h	
 
-			cmp 	al, testecar
+			cmp 	al, paredecar
 			je		PAREDE
 			
 			goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
@@ -269,11 +275,7 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 		call		apaga_ecran
-		goto_xy	1,1
-		mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
-		mov		bh,0			; numero da p�gina
-		int		10h	
-		mov paredecar,al
+		
 		goto_xy		0,0
 		call		IMP_FICH
 		call 		AVATAR
