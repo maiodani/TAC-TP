@@ -29,7 +29,7 @@ dseg	segment para public 'data'
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich         	db      'menu.TXT',0
+        Fich         	db      'labi.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
 
@@ -40,6 +40,8 @@ dseg	segment para public 'data'
 		POSx			db	3	; POSx pode ir [1..80]	
 		POSya			db	3	; Posi��o anterior de y
 		POSxa			db	3	; Posi��o anterior de x
+		paredecar		db  32
+		teclapress		db  0
 dseg	ends
 
 cseg	segment para public 'code'
@@ -168,7 +170,15 @@ AVATAR	PROC
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
 	
 
-CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
+CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h
+			mov		bh,0			; numero da p�gina
+			int		10h	
+
+			cmp 	al, testecar
+			je		PAREDE
+			
+			goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
@@ -179,12 +189,12 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			int		10h		
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
-		
+
 			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 			mov		dl, Car	
 			int		21H			
-	
+			
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 IMPRIME:	mov		ah, 02h
 			mov		dl, 190	; Coloca AVATAR
@@ -202,27 +212,49 @@ LER_SETA:	call 	LE_TECLA
 			CMP 	AL, 27	; ESCAPE
 			JE		FIM
 			jmp		LER_SETA
-		
+
+
+;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
+PAREDE:		mov 	al,50h				;baixo
+			cmp 	teclapress,48h
+			je		BAIXO
+			
+			mov 	al,48h				;cima
+			cmp 	teclapress,50h
+			je		ESTEND
+
+			mov 	al,4Dh				;direita
+			cmp 	teclapress,4Bh
+			je		DIREITA
+			
+			mov 	al,4Bh				;esquerda
+			cmp 	teclapress,4Dh
+			je		ESQUERDA
+				
 ESTEND:		cmp 	al,48h
 			jne		BAIXO
-			dec		POSy		;cima
+			dec		POSy	;cima
+			mov 	teclapress,al	
 			jmp		CICLO
 
 BAIXO:		cmp		al,50h
 			jne		ESQUERDA
 			inc 	POSy		;Baixo
+			mov 	teclapress,al	
 			jmp		CICLO
 
 ESQUERDA:
 			cmp		al,4Bh
 			jne		DIREITA
 			dec		POSx		;Esquerda
+			mov 	teclapress,al	
 			jmp		CICLO
 
 DIREITA:
 			cmp		al,4Dh
 			jne		LER_SETA 
 			inc		POSx		;Direita
+			mov 	teclapress,al	
 			jmp		CICLO
 
 fim:				
@@ -236,9 +268,13 @@ Main  proc
 		
 		mov			ax,0B800h
 		mov			es,ax
-		
 		call		apaga_ecran
-		goto_xy		13,40
+		goto_xy	1,1
+		mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+		mov		bh,0			; numero da p�gina
+		int		10h	
+		mov paredecar,al
+		goto_xy		0,0
 		call		IMP_FICH
 		call 		AVATAR
 		goto_xy		0,22
