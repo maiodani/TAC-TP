@@ -262,7 +262,7 @@ Perder:
 	MOSTRA	Fim_Perdeu
 	mov		al,1
 	mov 	Fim_Jogo,al
-	jmp 	fim_horas
+	jmp 	Nao_100
 Tempo_Contador ENDP
 
 ;########################################################################
