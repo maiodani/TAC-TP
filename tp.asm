@@ -171,7 +171,7 @@ Ler_TEMPO PROC
  		RET 
 Ler_TEMPO   ENDP 
 
-Trata_Horas PROC
+Tempo_Contador PROC
 
 		PUSHF
 		PUSH AX
@@ -221,7 +221,7 @@ Trata_Horas PROC
 		MOV 	STR12[3],'$'
 		goto_xy	10,0
 		MOSTRA	STR12 	
-		mov cx,100
+		
 
 		inc		Tempo_j
 		mov 	ax,Tempo_j
@@ -230,13 +230,22 @@ Trata_Horas PROC
 		
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		
 		MOV 	String_TJ[1],al
 		MOV		String_TJ[2],ah
+
+		cmp 	al,':'
+		jne		Nao_100
+		mov 	al,'0'
+		MOV 	String_TJ[1],al
+		cmp 	ah,'0'
+		jne		Nao_100
+		MOV 	String_TJ[0],'1'
+		jmp	Perder
+
+Nao_100:
 		goto_xy	60,0
 		MOSTRA	String_TJ	
 
-						
 fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
@@ -247,15 +256,17 @@ fim_horas:
 		POP AX
 		RET		
 			
-Trata_Horas ENDP
-Tempo PROC
+Perder:
+	goto_xy	60,20
+	MOSTRA	Fim_Perdeu
+	call 	Fim
+Tempo_Contador ENDP
 
-Tempo ENDP
 ;########################################################################
 ; LE UMA TECLA	
 LE_TECLA	PROC
 sem_tecla:
-		call 	Trata_Horas
+		call 	Tempo_Contador
 		MOV		AH,0BH
 		INT 	21h
 		cmp 	AL,0
@@ -385,7 +396,11 @@ DIREITA:
 fim:				
 			RET
 AVATAR		endp
+;########################################################################
+; Fim do jogo
+Fim 	proc
 
+Fim		endp
 ;########################################################################
 ; MAIN
 Main  proc
