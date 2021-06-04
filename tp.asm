@@ -17,7 +17,7 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"Nivel:0$"
+		String_num 		db 		"Nivel:1$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
 
@@ -311,7 +311,7 @@ LE_TECLA	endp
 
 
 ;########################################################################
-; nivéis
+; Niveis
 
 Nivel	PROC
 	mov 	al,String_num[6]	
@@ -341,7 +341,7 @@ nivel2:
 	mov		String_palavra[1],'R'
 	mov		String_palavra[2],'R'
 	mov		String_palavra[3],'O'
-	mov		String_palavra[3],'Z'
+	mov		String_palavra[4],'Z'
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -393,16 +393,17 @@ Nivel	endp
 ; Encontrar a Palavra
 Encontrar_Palavra	PROC
 	cmp		car,' '
-	je	Sair_Palavra
+	je		Sair_Palavra
 	mov 	bx,0
-	mov		cx,8
-Ciclo_Palavra:
+	mov		cx,10
 	mov 	al,car
+Ciclo_Palavra:
 	cmp		al,String_palavra[bx]
 	jne		Diferente	
 	mov		String_game[bx],al	
 	goto_xy 10,21
 	MOSTRA String_game
+	mov 	car,' '
 	
 
 Diferente:
@@ -417,6 +418,7 @@ Encontrar_Palavra	endp
 ;########################################################################
 ; Avatar
 AVATAR	PROC
+INICIO:
 			mov		ax,0B800h
 			mov		es,ax
 
@@ -454,8 +456,6 @@ CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
 
-			call Encontrar_Palavra
-
 			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 			mov		dl, Car	
@@ -473,6 +473,21 @@ IMPRIME:	mov		ah, 02h
 			mov		al, POSy	; Guarda a posi��o do cursor
 			mov 	POSya, al
 		
+
+VERIFICA_CONCLUSAO:
+			call 	Encontrar_Palavra
+			mov 	cx,10
+			mov 	bx,0
+Ciclo_compara:
+			mov al, String_palavra[bx]
+			cmp al, String_game[bx]
+			jne		LER_SETA
+			inc		bx
+			loop	Ciclo_compara
+			jmp		PROXIMO_NIVEL
+
+			
+
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
@@ -480,7 +495,24 @@ LER_SETA:	call 	LE_TECLA
 			JE		FIM
 			jmp		LER_SETA
 
-
+PROXIMO_NIVEL:
+			inc		String_num[6]
+			mov 	cx,10
+			mov 	bx,0
+Ciclo_reset:
+			mov 	String_game[bx],' '
+			mov 	String_palavra[bx],' '
+			inc		bx
+			loop	Ciclo_reset
+			mov 	String_TJ[0],' '
+			mov 	String_TJ[1],' '
+			mov 	String_TJ[2],' '   
+			mov		Tempo_j,0
+			call		apaga_ecran
+			goto_xy		0,0
+			call		IMP_FICH
+			call 	Nivel
+			jmp 	INICIO
 ;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
 PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,48h
