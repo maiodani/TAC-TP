@@ -260,9 +260,11 @@ fim_horas:
 Perder:
 	goto_xy	60,20
 	MOSTRA	Fim_Perdeu
+	goto_xy	60,0
+	MOSTRA	String_TJ
 	mov		al,1
 	mov 	Fim_Jogo,al
-	jmp 	Nao_100
+	jmp 	fim_horas
 Tempo_Contador ENDP
 
 ;########################################################################
