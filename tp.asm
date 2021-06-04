@@ -17,8 +17,10 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"  0 $"
-        String_nome  	db	    "ISEC  $"	
+		String_num 		db 		"Nivel:0$"
+        String_palavra  db	    "          $"	;10 digitos
+
+
 		Construir_nome	db	    "            $"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
@@ -192,7 +194,7 @@ Tempo_Contador PROC
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			 
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'h'		
 		MOV 	STR12[3],'$'
@@ -204,7 +206,7 @@ Tempo_Contador PROC
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			 
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'m'		
 		MOV 	STR12[3],'$'
@@ -216,7 +218,7 @@ Tempo_Contador PROC
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			 
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'s'		
 		MOV 	STR12[3],'$'
@@ -229,8 +231,8 @@ Tempo_Contador PROC
 		MOV 	bl, 10     
 		div 	bl
 		
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
+		add 	al, 30h				
+		add		ah,	30h				
 		MOV 	String_TJ[1],al
 		MOV		String_TJ[2],ah
 
@@ -293,8 +295,80 @@ SAIR_JOGO:	mov		al, 27
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
 
+;########################################################################
+; nivéis
 
-
+Nivel	PROC
+	mov 	al,String_num[6]	
+	goto_xy 30,0
+	MOSTRA	String_num
+	cmp 	al,'1'
+	je		nivel1
+	cmp 	al,'2'
+	je		nivel2
+	cmp 	al,'3'
+	je		nivel3
+	cmp 	al,'4'
+	je		nivel4
+	cmp 	al,'5'
+	je		nivel5
+	
+nivel1:
+	mov		String_palavra[0],'I'
+	mov		String_palavra[1],'S'
+	mov		String_palavra[2],'E'
+	mov		String_palavra[3],'C'
+	goto_xy 10,20
+	MOSTRA String_palavra
+	jmp 	Sair_Nivel
+nivel2:
+	mov		String_palavra[0],'B'
+	mov		String_palavra[1],'A'
+	mov		String_palavra[2],'T'
+	mov		String_palavra[3],'A'
+	mov		String_palavra[4],'T'
+	mov		String_palavra[5],'A'
+	goto_xy 10,20
+	MOSTRA String_palavra
+	jmp 	Sair_Nivel
+nivel3:
+	mov		String_palavra[0],'A'
+	mov		String_palavra[1],'R'
+	mov		String_palavra[2],'R'
+	mov		String_palavra[3],'O'
+	mov		String_palavra[3],'Z'
+	goto_xy 10,20
+	MOSTRA String_palavra
+	jmp 	Sair_Nivel
+nivel4:
+	mov		String_palavra[0],'A'
+	mov		String_palavra[1],'U'
+	mov		String_palavra[2],'T'
+	mov		String_palavra[3],'O'
+	mov		String_palavra[4],'C'
+	mov		String_palavra[5],'A'
+	mov		String_palavra[6],'R'
+	mov		String_palavra[7],'R'
+	mov		String_palavra[8],'O'
+	goto_xy 10,20
+	MOSTRA String_palavra	
+	jmp 	Sair_Nivel
+nivel5:
+	mov		String_palavra[0],'Z'
+	mov		String_palavra[1],'A'
+	mov		String_palavra[2],'M'
+	mov		String_palavra[3],'B'
+	mov		String_palavra[4],'U'
+	mov		String_palavra[5],'J'
+	mov		String_palavra[6],'E'
+	mov		String_palavra[7],'I'
+	mov		String_palavra[8],'R'
+	mov		String_palavra[9],'O'
+	goto_xy 10,20
+	MOSTRA String_palavra
+	jmp 	Sair_Nivel
+Sair_Nivel: RET
+Nivel	endp
 ;########################################################################
 ; Avatar
 
@@ -342,6 +416,7 @@ CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			int		21H			
 			
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
+
 IMPRIME:	mov		ah, 02h
 			mov		dl, 190	; Coloca AVATAR
 			int		21H	
@@ -406,11 +481,13 @@ DIREITA:
 FIM:				
 			RET
 AVATAR		endp
-;########################################################################
-; Fim do jogo
-FimJogo 	proc
 
-FimJogo		endp
+;########################################################################
+; Top 10
+Top10	proc
+
+Top10	endp
+
 ;########################################################################
 ; MAIN
 Main  proc
@@ -422,9 +499,13 @@ Main  proc
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH
+		call 		Nivel
 		call 		AVATAR
 		goto_xy		0,22
-		;call 		FimJogo
+		;call		apaga_ecran
+		;goto_xy		0,0
+		;call 		Top10
+
 		mov			ah,4CH
 		INT			21H
 Main	endp
