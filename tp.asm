@@ -19,6 +19,7 @@ dseg	segment para public 'data'
 
 		String_num 		db 		"Nivel:0$"
         String_palavra  db	    "          $"	;10 digitos
+		String_game  	db	    "          $"	;10 digitos
 
 
 		Construir_nome	db	    "            $"	
@@ -335,22 +336,22 @@ nivel1:
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
-nivel2:
+nivel2:	
+	mov		String_palavra[0],'A'
+	mov		String_palavra[1],'R'
+	mov		String_palavra[2],'R'
+	mov		String_palavra[3],'O'
+	mov		String_palavra[3],'Z'
+	goto_xy 10,20
+	MOSTRA String_palavra
+	jmp 	Sair_Nivel
+nivel3:
 	mov		String_palavra[0],'B'
 	mov		String_palavra[1],'A'
 	mov		String_palavra[2],'T'
 	mov		String_palavra[3],'A'
 	mov		String_palavra[4],'T'
 	mov		String_palavra[5],'A'
-	goto_xy 10,20
-	MOSTRA String_palavra
-	jmp 	Sair_Nivel
-nivel3:
-	mov		String_palavra[0],'A'
-	mov		String_palavra[1],'R'
-	mov		String_palavra[2],'R'
-	mov		String_palavra[3],'O'
-	mov		String_palavra[3],'Z'
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -383,6 +384,32 @@ nivel5:
 	jmp 	Sair_Nivel
 Sair_Nivel: RET
 Nivel	endp
+
+
+
+
+
+;########################################################################
+; Encontrar a Palavra
+Encontrar_Palavra	PROC
+	cmp		car,' '
+	je	Sair_Palavra
+	mov 	bx,0
+	mov		cx,8
+Ciclo_Palavra:
+	mov 	al,car
+	cmp		al,String_palavra[bx]
+	jne		Diferente	
+	mov		String_game[bx],al	
+	goto_xy 10,21
+	MOSTRA String_game
+	
+
+Diferente:
+	inc		bx
+	loop Ciclo_Palavra
+Sair_Palavra: RET
+Encontrar_Palavra	endp
 
 
 
@@ -426,6 +453,8 @@ CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			int		10h		
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
+
+			call Encontrar_Palavra
 
 			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
