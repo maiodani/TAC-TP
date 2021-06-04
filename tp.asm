@@ -70,8 +70,9 @@ ENDM
 
 
 
-;ROTINA PARA APAGAR ECRAN
 
+
+;ROTINA PARA APAGAR ECRAN
 apaga_ecran	proc
 			mov		ax,0B800h
 			mov		es,ax
@@ -87,9 +88,12 @@ apaga:		mov		byte ptr es:[bx],' '
 apaga_ecran	endp
 
 
+
+
+
+
 ;########################################################################
 ; IMP_FICH
-
 IMP_FICH	PROC
 
 		;abre ficheiro
@@ -139,6 +143,10 @@ sai_f:
 		RET
 		
 IMP_FICH	endp		
+
+
+
+
 
 ;########################################################################
 ; Imprime o tempo no monitor
@@ -269,6 +277,10 @@ Perder:
 	jmp 	fim_horas
 Tempo_Contador ENDP
 
+
+
+
+
 ;########################################################################
 ; LE UMA TECLA	
 LE_TECLA	PROC
@@ -294,6 +306,8 @@ SAI_TECLA:	RET
 SAIR_JOGO:	mov		al, 27
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
+
+
 
 ;########################################################################
 ; nivéis
@@ -369,9 +383,12 @@ nivel5:
 	jmp 	Sair_Nivel
 Sair_Nivel: RET
 Nivel	endp
+
+
+
+
 ;########################################################################
 ; Avatar
-
 AVATAR	PROC
 			mov		ax,0B800h
 			mov		es,ax
@@ -482,11 +499,18 @@ FIM:
 			RET
 AVATAR		endp
 
+
+
+
 ;########################################################################
 ; Top 10
 Top10	proc
 
 Top10	endp
+
+
+
+
 
 ;########################################################################
 ; MAIN
