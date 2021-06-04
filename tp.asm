@@ -23,6 +23,7 @@ dseg	segment para public 'data'
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
+		Fim_Jogo		db		0 ; Se for 0 o jogo não acabou se for 1 o jogo acabou
 		Fim_Ganhou		db	    " Ganhou $"	
 		Fim_Perdeu		db	    " Perdeu $"	
 
@@ -240,7 +241,7 @@ Tempo_Contador PROC
 		cmp 	ah,'0'
 		jne		Nao_100
 		MOV 	String_TJ[0],'1'
-		jmp	Perder
+		jmp		Perder
 
 Nao_100:
 		goto_xy	60,0
@@ -259,7 +260,9 @@ fim_horas:
 Perder:
 	goto_xy	60,20
 	MOSTRA	Fim_Perdeu
-	call 	Fim
+	mov		al,1
+	mov 	Fim_Jogo,al
+	jmp 	fim_horas
 Tempo_Contador ENDP
 
 ;########################################################################
@@ -267,6 +270,8 @@ Tempo_Contador ENDP
 LE_TECLA	PROC
 sem_tecla:
 		call 	Tempo_Contador
+		cmp 	Fim_Jogo,1
+		je		SAIR_JOGO
 		MOV		AH,0BH
 		INT 	21h
 		cmp 	AL,0
@@ -281,6 +286,9 @@ sem_tecla:
 		int		21h
 		mov		ah,1
 SAI_TECLA:	RET
+
+SAIR_JOGO:	mov		al, 27
+			jmp 	SAI_TECLA	
 LE_TECLA	endp
 
 
@@ -393,14 +401,14 @@ DIREITA:
 			mov 	teclapress,al	
 			jmp		CICLO
 
-fim:				
+FIM:				
 			RET
 AVATAR		endp
 ;########################################################################
 ; Fim do jogo
-Fim 	proc
+FimJogo 	proc
 
-Fim		endp
+FimJogo		endp
 ;########################################################################
 ; MAIN
 Main  proc
@@ -414,7 +422,7 @@ Main  proc
 		call		IMP_FICH
 		call 		AVATAR
 		goto_xy		0,22
-		
+		;call 		FimJogo
 		mov			ah,4CH
 		INT			21H
 Main	endp
