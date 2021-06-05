@@ -7,7 +7,7 @@ dseg	segment para public 'data'
 
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
-		
+
 		Horas			dw		0				; Vai guardar a HORA actual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -17,12 +17,13 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"Nivel:4$"
+		String_num 		db 		"Nivel:1$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
+		String_pontos 	db 		"  0$"
+		num_car			db		0				; Numero de carcteres
 
-
-		Construir_nome	db	    "            $"	
+		Construir_nome	db	    "            $"
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
@@ -324,7 +325,9 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
-	mov 	al,String_num[6]	
+	goto_xy 70,0
+	MOSTRA	String_pontos
+	mov 	al,String_num[6]
 	goto_xy 30,0
 	MOSTRA	String_num
 	cmp 	al,'1'
@@ -343,8 +346,11 @@ nivel1:
 	mov		String_palavra[1],'S'
 	mov		String_palavra[2],'E'
 	mov		String_palavra[3],'C'
+	mov		al,4
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
+	
 	jmp 	Sair_Nivel
 nivel2:	
 	mov		String_palavra[0],'A'
@@ -352,6 +358,8 @@ nivel2:
 	mov		String_palavra[2],'R'
 	mov		String_palavra[3],'O'
 	mov		String_palavra[4],'Z'
+	mov		al,5
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -362,6 +370,8 @@ nivel3:
 	mov		String_palavra[3],'A'
 	mov		String_palavra[4],'T'
 	mov		String_palavra[5],'A'
+	mov		al,6
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -375,17 +385,36 @@ nivel4:
 	mov		String_palavra[6],'R'
 	mov		String_palavra[7],'R'
 	mov		String_palavra[8],'O'
+	mov		al,9
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
 	mov		String_palavra[1],'A'
-
+	mov		String_palavra[2],'M'
+	mov		String_palavra[3],'B'
+	mov		String_palavra[4],'U'
+	mov		String_palavra[5],'J'
+	mov		String_palavra[6],'I'
+	mov		String_palavra[7],'R'
+	mov		String_palavra[8],'O'
+	
+	mov		al,9
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
-Sair_Nivel: RET
+Sair_Nivel: ;mov 	al,10
+			;mov 	dx,Tempo_j
+			;div		dx
+			;add		al,num_car
+			;mov		dl,10
+			;mul		dl
+			;add		al,String_pontos
+			;mov 	String_pontos,al
+			RET
 Nivel	endp
 
 
@@ -407,7 +436,6 @@ Ciclo_Palavra:
 	goto_xy 10,21
 	MOSTRA String_game
 	mov 	car,' '
-	
 
 Diferente:
 	inc		bx
@@ -439,7 +467,6 @@ INICIO:
 			int		10h	
 			mov paredecar,al
 	
-
 CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h
 			mov		bh,0			; numero da p�gina
@@ -476,12 +503,12 @@ IMPRIME:	mov		ah, 02h
 			mov		POSxa, al
 			mov		al, POSy	; Guarda a posi��o do cursor
 			mov 	POSya, al
-		
 
 VERIFICA_CONCLUSAO:
 			call 	Encontrar_Palavra
 			mov 	cx,10
 			mov 	bx,0
+
 Ciclo_compara:
 			mov al, String_palavra[bx]
 			cmp al, String_game[bx]
@@ -489,8 +516,6 @@ Ciclo_compara:
 			inc		bx
 			loop	Ciclo_compara
 			jmp		PROXIMO_NIVEL
-
-			
 
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
@@ -505,6 +530,7 @@ PROXIMO_NIVEL:
 			je		GANHAR
 			mov 	cx,10
 			mov 	bx,0
+
 Ciclo_reset:
 			mov 	String_game[bx],' '
 			mov 	String_palavra[bx],' '
@@ -514,15 +540,16 @@ Ciclo_reset:
 			mov 	String_TJ[1],' '
 			mov 	String_TJ[2],' '   
 			mov		Tempo_j,0
-			call		apaga_ecran
-			goto_xy		0,0
-			call		IMP_FICH
+			call	apaga_ecran
+			goto_xy	0,0
+			call	IMP_FICH
 			call 	Nivel
 			jmp 	INICIO
 
 GANHAR:		goto_xy	60,20
 			MOSTRA	Fim_Ganhou
 			jmp 	FIM
+
 
 ;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
 PAREDE:		mov 	al,50h				;baixo
@@ -540,7 +567,7 @@ PAREDE:		mov 	al,50h				;baixo
 			mov 	al,4Bh				;esquerda
 			cmp 	teclapress,4Dh
 			je		ESQUERDA
-				
+
 ESTEND:		cmp 	al,48h
 			jne		BAIXO
 			dec		POSy	;cima
@@ -577,8 +604,60 @@ AVATAR		endp
 ;########################################################################
 ; Top 10
 Top10	proc
-	call		apaga_ecran
-	call		IMP_FICH
+	call	apaga_ecran
+	call	IMP_FICH		
+
+Guardar_Ficheiro:
+	;abre ficheiro
+	mov     ah,3dh
+	mov     al,0
+	
+	cmp 	nFich, 0			
+
+	lea     dx,Fich
+	int     21h
+	jc      erro_abrir
+	mov     HandleFich,ax
+	jmp     ler_ciclo
+
+erro_abrir:
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f
+
+ler_ciclo:
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo
+
+erro_ler:
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
+
+fecha_ficheiro:
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f
+
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
+
+sai_f:	
+		RET
+
 Top10	endp
 
 
@@ -609,7 +688,7 @@ Main  proc
 		call 		AVATAR
 		goto_xy		0,22
 		;call		apaga_ecran
-		;goto_xy		0,0
+		;goto_xy	0,0
 		;call 		Top10
 
 		mov			ah,4CH
