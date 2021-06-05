@@ -428,7 +428,7 @@ INICIO:
 			int		10h			
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
-
+			
 			goto_xy	1,1
 			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		bh,0			; numero da p�gina
