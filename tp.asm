@@ -33,7 +33,7 @@ dseg	segment para public 'data'
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich         	db      'menu.TXT',0
+        Fich         	db      'labi.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
 
@@ -578,7 +578,7 @@ AVATAR		endp
 ; Top 10
 Top10	proc
 	call		apaga_ecran
-	
+	call		IMP_FICH
 Top10	endp
 
 
