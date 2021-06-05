@@ -17,7 +17,7 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"Nivel:1$"
+		String_num 		db 		"Nivel:4$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
 
@@ -33,9 +33,11 @@ dseg	segment para public 'data'
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich         	db      'labi.TXT',0
+        Fich         	db      'menu.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
+
+		nFich			db		0	;Saber qual .txt buscar
 
 		string			db	"Teste pr�tico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecran 
@@ -100,11 +102,18 @@ IMP_FICH	PROC
 		;abre ficheiro
         mov     ah,3dh
         mov     al,0
+		
+		cmp 	nFich, 0			
+
         lea     dx,Fich
         int     21h
         jc      erro_abrir
         mov     HandleFich,ax
         jmp     ler_ciclo
+
+mudaFich:
+	
+
 
 erro_abrir:
         mov     ah,09h
@@ -304,9 +313,10 @@ sem_tecla:
 		mov		ah,1
 SAI_TECLA:	RET
 
-SAIR_JOGO:	mov		al, 27
+SAIR_JOGO:	mov		al, 27	;tecla escape
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
+
 
 
 
@@ -371,14 +381,7 @@ nivel4:
 nivel5:
 	mov		String_palavra[0],'Z'
 	mov		String_palavra[1],'A'
-	mov		String_palavra[2],'M'
-	mov		String_palavra[3],'B'
-	mov		String_palavra[4],'U'
-	mov		String_palavra[5],'J'
-	mov		String_palavra[6],'E'
-	mov		String_palavra[7],'I'
-	mov		String_palavra[8],'R'
-	mov		String_palavra[9],'O'
+
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -415,6 +418,7 @@ Encontrar_Palavra	endp
 
 
 
+
 ;########################################################################
 ; Avatar
 AVATAR	PROC
@@ -423,7 +427,7 @@ INICIO:
 			mov		es,ax
 
 			goto_xy	POSx,POSy		; Vai para nova possi��o
-			mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		bh,0			; numero da p�gina
 			int		10h			
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
@@ -497,6 +501,8 @@ LER_SETA:	call 	LE_TECLA
 
 PROXIMO_NIVEL:
 			inc		String_num[6]
+			cmp 	String_num[6],'6'
+			je		GANHAR
 			mov 	cx,10
 			mov 	bx,0
 Ciclo_reset:
@@ -513,6 +519,11 @@ Ciclo_reset:
 			call		IMP_FICH
 			call 	Nivel
 			jmp 	INICIO
+
+GANHAR:		goto_xy	60,20
+			MOSTRA	Fim_Ganhou
+			jmp 	FIM
+
 ;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
 PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,48h
@@ -566,10 +577,19 @@ AVATAR		endp
 ;########################################################################
 ; Top 10
 Top10	proc
-
+	call		apaga_ecran
+	
 Top10	endp
 
 
+
+;########################################################################
+; Menu
+Menu proc
+
+		
+		RET
+Menu endp
 
 
 
@@ -583,6 +603,7 @@ Main  proc
 		mov			es,ax
 		call		apaga_ecran
 		goto_xy		0,0
+		call		Menu
 		call		IMP_FICH
 		call 		Nivel
 		call 		AVATAR
