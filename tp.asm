@@ -113,12 +113,10 @@ IMP_FICH	PROC
 
 mudaJogo:
 		mov		Fich[0],'l'
-		mov		Fich[0],'a'
-		mov		Fich[0],'b'
-		mov		Fich[0],'i'
+		mov		Fich[1],'a'
+		mov		Fich[2],'b'
+		mov		Fich[3],'i'
 	
-
-
 erro_abrir:
         mov     ah,09h
         lea     dx,Erro_Open
@@ -649,13 +647,19 @@ ESTEND:		cmp 	al,48h
 			dec		POSy	;cima
 			dec		POSy
 			mov 	teclapress,al	
+
+			call 	Menu					;!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 			jmp		CICLO
 
 BAIXO:		cmp		al,50h
 			inc 	POSy		;Baixo
 			inc 	POSy
-			mov 	teclapress,al	
-			jmp		CICLO
+			mov 	teclapress,al
+
+			call 	Menu					;!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			jmp		CICLO		
 
 PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,48h
@@ -684,16 +688,36 @@ Menu proc
 		mov			POSx, 27
 		mov			POSy, 7
 
-		jmp			jogar_menu
+		cmp			POSy, 7
+		call		MenuJogoFunc
 
 		cmp 		POSy, 9
-		je			top10_menu
+		call		MenuTop10Func
 
-		cmp 		POSy, 11
-		;je			sair_menu
+		cmp			POSy, 11
+		call		MenuSairFunc
+
+		RET
+
+		cmp 		nFich, 1
+		je			menu_jogo			
+
 		
+menu_jogo:									;apaga o ecran e muda para o jogo (por implementar)
+		call		apaga_ecran
+		call		IMP_FICH
 
-jogar_menu:								;coloca [JOGAR] a cyan
+menu_top10:
+		call		apaga_ecran
+		call		IMP_FICH
+Menu endp
+
+MenuJogoFunc proc						;coloca [JOGAR] a cyan
+		cmp			POSy, 7
+		jne			saltaMtop
+
+		call		LimpaSelecionado
+
 		mov			al, 83H				;83H a piscar / 3H estático
 		mov			bx, 1178
 		mov 		cx, 7
@@ -702,36 +726,90 @@ CicloMenuJogar:
 		inc			bx
 		inc			bx
 		loop		CicloMenuJogar
-;fimCiclo
-			
-top10_menu:
-		mov			bx, 1338
-		mov			cx,	7
+;fimCiclo		
+		call		AVATAR_MENU
+saltaMtop:
+		call		MenuTop10Func
+								
+MenuJogoFunc endp
 
+MenuTop10Func proc
+		cmp			POSy, 9
+		jne			saltaSair
+
+		call		LimpaSelecionado		
+
+		mov			al, 83H
+		mov			bx, 1338
+		mov			cx,	10
 CicloMenuTop10:
 		mov			es:[bx+1], al
 		inc			bx
 		inc			bx
 		loop		CicloMenuTop10
 
+		call		AVATAR_MENU
+saltaSair:
+		call		MenuSairFunc
+			
+MenuTop10Func endp
 
-		call 		AVATAR_MENU
 
-		cmp 		nFich, 1
-		je			menu_jogo	
-
-
+MenuSairFunc proc
+		cmp			POSy, 11
+		jne			saltaJogo
 		
+		call		LimpaSelecionado
 
+		mov			al, 83H
+		mov			bx, 1498
+		mov			cx,	6
 
-menu_jogo:									;apaga o ecran e muda para o jogo
-		call		apaga_ecran
-		call		IMP_FICH
+CicloSair:
+		mov			es:[bx+1], al
+		inc			bx
+		inc			bx
+		loop		CicloSair
 
-menu_top10:
-		call		apaga_ecran
-		call		IMP_FICH
-Menu endp
+		call		AVATAR_MENU
+saltaJogo:
+		call 		MenuJogoFunc
+			
+MenuSairFunc endp
+
+LimpaSelecionado proc
+		mov			al, 15
+		mov			bx, 1178
+		mov 		cx, 7
+
+		CicloLimpa1:
+					mov			es:[bx+1], al
+					inc			bx
+					inc			bx
+					loop		CicloLimpa1
+		;
+		mov			al, 15
+		mov			bx, 1338
+		mov			cx,	10
+
+		CicloLimpa2:
+					mov			es:[bx+1], al
+					inc			bx
+					inc			bx
+					loop		CicloLimpa2
+		;
+		mov			al, 15
+		mov			bx, 1498
+		mov			cx,	6
+
+		CicloLimpa3:
+					mov			es:[bx+1], al
+					inc			bx
+					inc			bx
+					loop		CicloLimpa3
+
+		RET
+LimpaSelecionado endp
 
 
 
