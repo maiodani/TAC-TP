@@ -585,6 +585,7 @@ AVATAR_MENU	PROC
 INICIO:
 			mov		ax,0B800h
 			mov		es,ax
+<<<<<<< Updated upstream
 
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
@@ -643,6 +644,66 @@ LER_SETA:	call 	LE_TECLA
 			je		ESTEND
 			jmp		LER_SETA
 
+=======
+
+			goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		bh,0			; numero da p�gina
+			int		10h			
+			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
+			
+			goto_xy	1,1
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		bh,0			; numero da p�gina
+			int		10h	
+			mov paredecar,al
+	
+
+CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h
+			mov		bh,0			; numero da p�gina
+			int		10h	
+			
+			cmp 	al, paredecar
+			je		PAREDE
+
+			goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
+			mov		ah, 02h
+			mov		dl, Car			; Repoe Caracter guardado 
+			int		21H		
+		
+			goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h
+			mov		bh,0			; numero da p�gina
+			int		10h		
+			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
+
+			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
+			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
+			mov		dl, Car	
+			int		21H			
+			
+			goto_xy	POSx,POSy		; Vai para posi��o do cursor
+
+IMPRIME:	mov		ah, 02h
+			mov		dl, 190	; Coloca AVATAR
+			int		21H	
+			goto_xy	POSx,POSy	; Vai para posi��o do cursor
+		
+			mov		al, POSx	; Guarda a posi��o do cursor
+			mov		POSxa, al
+			mov		al, POSy	; Guarda a posi��o do cursor
+			mov 	POSya, al
+			
+
+LER_SETA:	call 	LE_TECLA
+			cmp		ah, 1
+			je		ESTEND
+			jmp		LER_SETA
+
+>>>>>>> Stashed changes
 				
 ESTEND:		cmp 	al,48h
 			jne		BAIXO
@@ -683,12 +744,21 @@ Top10	endp
 Menu proc	
 		mov			POSx, 27
 		mov			POSy, 7
+<<<<<<< Updated upstream
 
 		jmp			jogar_menu
 
 		cmp 		POSy, 9
 		je			top10_menu
 
+=======
+
+		jmp			jogar_menu
+
+		cmp 		POSy, 9
+		je			top10_menu
+
+>>>>>>> Stashed changes
 		cmp 		POSy, 11
 		;je			sair_menu
 		
@@ -703,7 +773,11 @@ CicloMenuJogar:
 		inc			bx
 		loop		CicloMenuJogar
 ;fimCiclo
+<<<<<<< Updated upstream
 			
+=======
+		jmp			
+>>>>>>> Stashed changes
 top10_menu:
 		mov			bx, 1338
 		mov			cx,	7
