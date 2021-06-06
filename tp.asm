@@ -7,7 +7,7 @@ dseg	segment para public 'data'
 
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
-
+		
 		Horas			dw		0				; Vai guardar a HORA actual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -17,13 +17,13 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"Nivel:1$"
+		String_num 		db 		"Nivel:4$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
-		String_pontos 	db 		"  0$"
-		num_car			db		0				; Numero de carcteres
+		
+		String_menu		db		"       $"		;7 digitos
 
-		Construir_nome	db	    "            $"
+		Construir_nome	db	    "            $"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
@@ -34,11 +34,12 @@ dseg	segment para public 'data'
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich         	db      'labi2.TXT',0
+        Fich         	db      'menu.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
 
-		nFich			db		0	;Saber qual .txt buscar
+		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10)
+
 
 		string			db	"Teste pr�tico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecran 
@@ -103,8 +104,6 @@ IMP_FICH	PROC
 		;abre ficheiro
         mov     ah,3dh
         mov     al,0
-		
-		cmp 	nFich, 0			
 
         lea     dx,Fich
         int     21h
@@ -112,7 +111,11 @@ IMP_FICH	PROC
         mov     HandleFich,ax
         jmp     ler_ciclo
 
-mudaFich:
+mudaJogo:
+		mov		Fich[0],'l'
+		mov		Fich[0],'a'
+		mov		Fich[0],'b'
+		mov		Fich[0],'i'
 	
 
 
@@ -296,9 +299,13 @@ Tempo_Contador ENDP
 ; LE UMA TECLA	
 LE_TECLA	PROC
 sem_tecla:
+		cmp		nFich, 1
+		jne		sem_teclaMENU	;se estiver no menu nao mostra o contador
+
 		call 	Tempo_Contador
 		cmp 	Fim_Jogo,1
 		je		SAIR_JOGO
+sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro
 		MOV		AH,0BH
 		INT 	21h
 		cmp 	AL,0
@@ -325,9 +332,7 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
-	goto_xy 70,0
-	MOSTRA	String_pontos
-	mov 	al,String_num[6]
+	mov 	al,String_num[6]	
 	goto_xy 30,0
 	MOSTRA	String_num
 	cmp 	al,'1'
@@ -346,11 +351,8 @@ nivel1:
 	mov		String_palavra[1],'S'
 	mov		String_palavra[2],'E'
 	mov		String_palavra[3],'C'
-	mov		al,4
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
-	
 	jmp 	Sair_Nivel
 nivel2:	
 	mov		String_palavra[0],'A'
@@ -358,8 +360,6 @@ nivel2:
 	mov		String_palavra[2],'R'
 	mov		String_palavra[3],'O'
 	mov		String_palavra[4],'Z'
-	mov		al,5
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -370,8 +370,6 @@ nivel3:
 	mov		String_palavra[3],'A'
 	mov		String_palavra[4],'T'
 	mov		String_palavra[5],'A'
-	mov		al,6
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -385,36 +383,17 @@ nivel4:
 	mov		String_palavra[6],'R'
 	mov		String_palavra[7],'R'
 	mov		String_palavra[8],'O'
-	mov		al,9
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
 	mov		String_palavra[1],'A'
-	mov		String_palavra[2],'M'
-	mov		String_palavra[3],'B'
-	mov		String_palavra[4],'U'
-	mov		String_palavra[5],'J'
-	mov		String_palavra[6],'I'
-	mov		String_palavra[7],'R'
-	mov		String_palavra[8],'O'
-	
-	mov		al,9
-	mov 	num_car,al
+
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
-Sair_Nivel: ;mov 	al,10
-			;mov 	dx,Tempo_j
-			;div		dx
-			;add		al,num_car
-			;mov		dl,10
-			;mul		dl
-			;add		al,String_pontos
-			;mov 	String_pontos,al
-			RET
+Sair_Nivel: RET
 Nivel	endp
 
 
@@ -436,6 +415,7 @@ Ciclo_Palavra:
 	goto_xy 10,21
 	MOSTRA String_game
 	mov 	car,' '
+	
 
 Diferente:
 	inc		bx
@@ -467,6 +447,7 @@ INICIO:
 			int		10h	
 			mov paredecar,al
 	
+
 CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h
 			mov		bh,0			; numero da p�gina
@@ -503,12 +484,12 @@ IMPRIME:	mov		ah, 02h
 			mov		POSxa, al
 			mov		al, POSy	; Guarda a posi��o do cursor
 			mov 	POSya, al
+		
 
 VERIFICA_CONCLUSAO:
 			call 	Encontrar_Palavra
 			mov 	cx,10
 			mov 	bx,0
-
 Ciclo_compara:
 			mov al, String_palavra[bx]
 			cmp al, String_game[bx]
@@ -516,6 +497,8 @@ Ciclo_compara:
 			inc		bx
 			loop	Ciclo_compara
 			jmp		PROXIMO_NIVEL
+
+			
 
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
@@ -530,7 +513,6 @@ PROXIMO_NIVEL:
 			je		GANHAR
 			mov 	cx,10
 			mov 	bx,0
-
 Ciclo_reset:
 			mov 	String_game[bx],' '
 			mov 	String_palavra[bx],' '
@@ -540,16 +522,15 @@ Ciclo_reset:
 			mov 	String_TJ[1],' '
 			mov 	String_TJ[2],' '   
 			mov		Tempo_j,0
-			call	apaga_ecran
-			goto_xy	0,0
-			call	IMP_FICH
+			call		apaga_ecran
+			goto_xy		0,0
+			call		IMP_FICH
 			call 	Nivel
 			jmp 	INICIO
 
 GANHAR:		goto_xy	60,20
 			MOSTRA	Fim_Ganhou
 			jmp 	FIM
-
 
 ;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
 PAREDE:		mov 	al,50h				;baixo
@@ -567,7 +548,7 @@ PAREDE:		mov 	al,50h				;baixo
 			mov 	al,4Bh				;esquerda
 			cmp 	teclapress,4Dh
 			je		ESQUERDA
-
+				
 ESTEND:		cmp 	al,48h
 			jne		BAIXO
 			dec		POSy	;cima
@@ -598,76 +579,158 @@ FIM:
 			RET
 AVATAR		endp
 
+;########################################################################
+; Avatar_MENU
+AVATAR_MENU	PROC
+INICIO:
+			mov		ax,0B800h
+			mov		es,ax
 
+			goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		bh,0			; numero da p�gina
+			int		10h			
+			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
+			
+			goto_xy	1,1
+			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		bh,0			; numero da p�gina
+			int		10h	
+			mov paredecar,al
+	
+
+CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h
+			mov		bh,0			; numero da p�gina
+			int		10h	
+			
+			cmp 	al, paredecar
+			je		PAREDE
+
+			goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
+			mov		ah, 02h
+			mov		dl, Car			; Repoe Caracter guardado 
+			int		21H		
+		
+			goto_xy	POSx,POSy		; Vai para nova possi��o
+			mov 	ah, 08h
+			mov		bh,0			; numero da p�gina
+			int		10h		
+			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
+
+			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
+			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
+			mov		dl, Car	
+			int		21H			
+			
+			goto_xy	POSx,POSy		; Vai para posi��o do cursor
+
+IMPRIME:	mov		ah, 02h
+			mov		dl, 190	; Coloca AVATAR
+			int		21H	
+			goto_xy	POSx,POSy	; Vai para posi��o do cursor
+		
+			mov		al, POSx	; Guarda a posi��o do cursor
+			mov		POSxa, al
+			mov		al, POSy	; Guarda a posi��o do cursor
+			mov 	POSya, al
+			
+
+LER_SETA:	call 	LE_TECLA
+			cmp		ah, 1
+			je		ESTEND
+			jmp		LER_SETA
+
+				
+ESTEND:		cmp 	al,48h
+			jne		BAIXO
+			dec		POSy	;cima
+			dec		POSy
+			mov 	teclapress,al	
+			jmp		CICLO
+
+BAIXO:		cmp		al,50h
+			inc 	POSy		;Baixo
+			inc 	POSy
+			mov 	teclapress,al	
+			jmp		CICLO
+
+PAREDE:		mov 	al,50h				;baixo
+			cmp 	teclapress,48h
+			je		BAIXO
+			
+			mov 	al,48h				;cima
+			cmp 	teclapress,50h
+			je		ESTEND
+FIM:				
+			RET
+AVATAR_MENU		endp
 
 
 ;########################################################################
 ; Top 10
 Top10	proc
-	call	apaga_ecran
-	call	IMP_FICH		
-
-Guardar_Ficheiro:
-	;abre ficheiro
-	mov     ah,3dh
-	mov     al,0
-	
-	cmp 	nFich, 0			
-
-	lea     dx,Fich
-	int     21h
-	jc      erro_abrir
-	mov     HandleFich,ax
-	jmp     ler_ciclo
-
-erro_abrir:
-	mov     ah,09h
-	lea     dx,Erro_Open
-	int     21h
-	jmp     sai_f
-
-ler_ciclo:
-	mov     ah,3fh
-	mov     bx,HandleFich
-	mov     cx,1
-	lea     dx,car_fich
-	int     21h
-	jc		erro_ler
-	cmp		ax,0		;EOF?
-	je		fecha_ficheiro
-	mov     ah,02h
-	mov		dl,car_fich
-	int		21h
-	jmp		ler_ciclo
-
-erro_ler:
-	mov     ah,09h
-	lea     dx,Erro_Ler_Msg
-	int     21h
-
-fecha_ficheiro:
-	mov     ah,3eh
-	mov     bx,HandleFich
-	int     21h
-	jnc     sai_f
-
-	mov     ah,09h
-	lea     dx,Erro_Close
-	Int     21h
-
-sai_f:	
-		RET
-
+	call		apaga_ecran
+	call		IMP_FICH
 Top10	endp
 
 
 
 ;########################################################################
 ; Menu
-Menu proc
+Menu proc	
+		mov			POSx, 27
+		mov			POSy, 7
+
+		jmp			jogar_menu
+
+		cmp 		POSy, 9
+		je			top10_menu
+
+		cmp 		POSy, 11
+		;je			sair_menu
+		
+
+jogar_menu:								;coloca [JOGAR] a cyan
+		mov			al, 83H				;83H a piscar / 3H estático
+		mov			bx, 1178
+		mov 		cx, 7
+CicloMenuJogar:
+		mov			es:[bx+1], al
+		inc			bx
+		inc			bx
+		loop		CicloMenuJogar
+;fimCiclo
+			
+top10_menu:
+		mov			bx, 1338
+		mov			cx,	7
+
+CicloMenuTop10:
+		mov			es:[bx+1], al
+		inc			bx
+		inc			bx
+		loop		CicloMenuTop10
+
+
+		call 		AVATAR_MENU
+
+		cmp 		nFich, 1
+		je			menu_jogo	
+
 
 		
-		RET
+
+
+menu_jogo:									;apaga o ecran e muda para o jogo
+		call		apaga_ecran
+		call		IMP_FICH
+
+menu_top10:
+		call		apaga_ecran
+		call		IMP_FICH
 Menu endp
 
 
@@ -682,8 +745,8 @@ Main  proc
 		mov			es,ax
 		call		apaga_ecran
 		goto_xy		0,0
-		call		Menu
 		call		IMP_FICH
+		call		Menu	
 		call 		Nivel
 		call 		AVATAR
 		goto_xy		0,22
