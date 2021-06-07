@@ -100,10 +100,17 @@ apaga_ecran	endp
 ;########################################################################
 ; IMP_FICH
 IMP_FICH	PROC
-
 		;abre ficheiro
+
         mov     ah,3dh
         mov     al,0
+
+		cmp		nFich, 1
+		je		mudaJogo
+
+		cmp		nFich, 2
+		je 		mudaSair
+inicio_imp:
 
         lea     dx,Fich
         int     21h
@@ -111,11 +118,7 @@ IMP_FICH	PROC
         mov     HandleFich,ax
         jmp     ler_ciclo
 
-mudaJogo:
-		mov		Fich[0],'l'
-		mov		Fich[1],'a'
-		mov		Fich[2],'b'
-		mov		Fich[3],'i'
+
 	
 erro_abrir:
         mov     ah,09h
@@ -153,6 +156,16 @@ fecha_ficheiro:
         Int     21h
 sai_f:	
 		RET
+
+mudaJogo:
+		mov		Fich[0],'l'
+		mov		Fich[1],'a'
+		mov		Fich[2],'b'
+		mov		Fich[3],'i'
+				
+		jmp 	inicio_imp
+mudaSair:
+		call	Main
 		
 IMP_FICH	endp		
 
@@ -303,12 +316,12 @@ sem_tecla:
 		call 	Tempo_Contador
 		cmp 	Fim_Jogo,1
 		je		SAIR_JOGO
-sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro
+
 		MOV		AH,0BH
 		INT 	21h
 		cmp 	AL,0
 		je	    sem_tecla
-		
+sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro		
 		mov		ah,08h
 		int		21h
 		mov		ah,0
@@ -648,18 +661,40 @@ ESTEND:		cmp 	al,48h
 			dec		POSy
 			mov 	teclapress,al	
 
-			call 	Menu					;!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			cmp		POSy, 7
+			je		saltaParaJogo
+
+			cmp		POSy, 9
+			je		saltaParaTop10	
 
 			jmp		CICLO
 
 BAIXO:		cmp		al,50h
+			jne		ENTER_PRESS
 			inc 	POSy		;Baixo
 			inc 	POSy
 			mov 	teclapress,al
 
-			call 	Menu					;!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			cmp		POSy, 9
+			je		saltaParaTop10
+
+			cmp		POSy, 11
+			je		saltaParaSair
 
 			jmp		CICLO		
+
+ENTER_PRESS:
+			cmp		al,7Ah				;z
+			jne		CICLO
+
+			cmp		POSy, 7
+			je		mudaParaJogo
+
+			cmp		POSy, 9
+			je		mudaParaTop10
+
+			cmp		POSy, 11
+			je		FIM
 
 PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,48h
@@ -668,6 +703,26 @@ PAREDE:		mov 	al,50h				;baixo
 			mov 	al,48h				;cima
 			cmp 	teclapress,50h
 			je		ESTEND
+
+saltaParaJogo:
+			call	MenuJogoFunc
+
+saltaParaTop10:
+			call	MenuTop10Func
+saltaParaSair:
+			call	MenuSairFunc
+
+mudaParaJogo:
+			mov 	nFich, 1
+			call	apaga_ecran
+			call	IMP_FICH
+			jmp		FIM
+
+mudaParaTop10:
+			mov 	nFich, 2
+			call	apaga_ecran
+			call	IMP_FICH
+			jmp		FIM
 FIM:				
 			RET
 AVATAR_MENU		endp
@@ -697,19 +752,7 @@ Menu proc
 		cmp			POSy, 11
 		call		MenuSairFunc
 
-		RET
-
-		cmp 		nFich, 1
-		je			menu_jogo			
-
-		
-menu_jogo:									;apaga o ecran e muda para o jogo (por implementar)
-		call		apaga_ecran
-		call		IMP_FICH
-
-menu_top10:
-		call		apaga_ecran
-		call		IMP_FICH
+		RET		
 Menu endp
 
 MenuJogoFunc proc						;coloca [JOGAR] a cyan
@@ -740,7 +783,7 @@ MenuTop10Func proc
 		call		LimpaSelecionado		
 
 		mov			al, 83H
-		mov			bx, 1338
+		mov			bx, 1498
 		mov			cx,	10
 CicloMenuTop10:
 		mov			es:[bx+1], al
@@ -762,7 +805,7 @@ MenuSairFunc proc
 		call		LimpaSelecionado
 
 		mov			al, 83H
-		mov			bx, 1498
+		mov			bx, 3316
 		mov			cx,	6
 
 CicloSair:
@@ -787,9 +830,9 @@ LimpaSelecionado proc
 					inc			bx
 					inc			bx
 					loop		CicloLimpa1
-		;
+		;--
 		mov			al, 15
-		mov			bx, 1338
+		mov			bx, 1498
 		mov			cx,	10
 
 		CicloLimpa2:
@@ -797,9 +840,9 @@ LimpaSelecionado proc
 					inc			bx
 					inc			bx
 					loop		CicloLimpa2
-		;
+		;--
 		mov			al, 15
-		mov			bx, 1498
+		mov			bx, 3316	
 		mov			cx,	6
 
 		CicloLimpa3:
@@ -821,6 +864,10 @@ Main  proc
 		
 		mov			ax,0B800h
 		mov			es,ax
+
+		cmp			nFich, 2
+		je			SAIR
+
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH
@@ -832,6 +879,7 @@ Main  proc
 		;goto_xy	0,0
 		;call 		Top10
 
+SAIR:
 		mov			ah,4CH
 		INT			21H
 Main	endp
