@@ -17,9 +17,11 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"   /100$"
 
-		String_num 		db 		"Nivel:4$"
+		String_num 		db 		"Nivel:1$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
+		Pontos 			dw 		0
+		num_car			db		0
 		
 		String_menu		db		"       $"		;7 digitos
 
@@ -38,7 +40,7 @@ dseg	segment para public 'data'
         HandleFich      dw      0
         car_fich        db      ?
 
-		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10)
+		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10,3-sair)
 
 
 		string			db	"Teste pr�tico de T.I",0
@@ -92,11 +94,6 @@ apaga:		mov		byte ptr es:[bx],' '
 			ret
 apaga_ecran	endp
 
-
-
-
-
-
 ;########################################################################
 ; IMP_FICH
 IMP_FICH	PROC
@@ -109,9 +106,10 @@ IMP_FICH	PROC
 		je		mudaJogo
 
 		cmp		nFich, 2
+
+		cmp		nFich, 3
 		je 		mudaSair
 inicio_imp:
-
         lea     dx,Fich
         int     21h
         jc      erro_abrir
@@ -163,13 +161,18 @@ mudaJogo:
 		mov		Fich[3],'i'
 				
 		jmp 	inicio_imp
+
+mudaTop10:
+		mov		Fich[0],'t'
+		mov		Fich[1],'p'
+		mov		Fich[2],'1'
+		mov		Fich[3],'0'
+
+		jmp 	inicio_imp
 mudaSair:
-		call	Main
+		RET
 		
 IMP_FICH	endp		
-
-
-
 
 
 ;########################################################################
@@ -361,6 +364,8 @@ nivel1:
 	mov		String_palavra[1],'S'
 	mov		String_palavra[2],'E'
 	mov		String_palavra[3],'C'
+	mov		al,4
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -370,6 +375,8 @@ nivel2:
 	mov		String_palavra[2],'R'
 	mov		String_palavra[3],'O'
 	mov		String_palavra[4],'Z'
+	mov		al,5
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -380,6 +387,8 @@ nivel3:
 	mov		String_palavra[3],'A'
 	mov		String_palavra[4],'T'
 	mov		String_palavra[5],'A'
+	mov		al,6
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -393,13 +402,16 @@ nivel4:
 	mov		String_palavra[6],'R'
 	mov		String_palavra[7],'R'
 	mov		String_palavra[8],'O'
+	mov		al,9
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
 	mov		String_palavra[1],'A'
-
+	mov		al,10
+	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -518,6 +530,14 @@ LER_SETA:	call 	LE_TECLA
 			jmp		LER_SETA
 
 PROXIMO_NIVEL:
+			xor 	ax,ax
+			mov 	ax,100
+			sub 	ax,Tempo_j
+			mov 	bl,num_car
+			mul 	bl
+			mov 	Pontos,ax
+			mov 	ax,es:[100]
+			mov 	es:[si],ax
 			inc		String_num[6]
 			cmp 	String_num[6],'6'
 			je		GANHAR
@@ -692,8 +712,6 @@ ENTER_PRESS:
 
 			jne		CICLO
 
-			
-
 			cmp		POSy, 7
 			je		mudaParaJogo
 
@@ -782,8 +800,10 @@ CicloMenuJogar:
 		loop		CicloMenuJogar
 ;fimCiclo		
 		call		AVATAR_MENU
+		RET
 saltaMtop:
 		call		MenuTop10Func
+		RET
 								
 MenuJogoFunc endp
 
@@ -803,6 +823,7 @@ CicloMenuTop10:
 		loop		CicloMenuTop10
 
 		call		AVATAR_MENU
+		RET
 saltaSair:
 		call		MenuSairFunc
 			
@@ -870,28 +891,36 @@ LimpaSelecionado endp
 ;########################################################################
 ; MAIN
 Main  proc
+INICIO_main:
 		mov			ax, dseg
 		mov			ds,ax
 		
 		mov			ax,0B800h
 		mov			es,ax
 
-
-
-
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH
-		call		Menu	
+
+		cmp			nFich, 1
+		jne			main_jump
+		
+		call		apaga_ecran
+		call		IMP_FICH
 		call 		Nivel
 		call 		AVATAR
 		goto_xy		0,22
 		;call		apaga_ecran
 		;goto_xy	0,0
 		;call 		Top10
+		
+main_jump:
 		cmp			nFich, 3
+		je			FIM_main	
 
-
+		call		Menu
+		jmp 		INICIO_main
+FIM_main:
 		mov			ah,4CH
 		INT			21H
 Main	endp
