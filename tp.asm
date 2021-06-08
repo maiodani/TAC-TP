@@ -876,13 +876,9 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 
-<<<<<<< HEAD
-=======
-		cmp			nFich, 2
-		je			SAIR
->>>>>>> parent of 4f1ce49 (yeeeeet)
 
-CICLO_MAIN:
+
+
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH
@@ -894,7 +890,7 @@ CICLO_MAIN:
 		;goto_xy	0,0
 		;call 		Top10
 		cmp			nFich, 3
-		jne 		CICLO_MAIN
+
 
 		mov			ah,4CH
 		INT			21H
