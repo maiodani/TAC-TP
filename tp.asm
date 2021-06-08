@@ -118,7 +118,6 @@ inicio_imp:
         mov     HandleFich,ax
         jmp     ler_ciclo
 
-
 	
 erro_abrir:
         mov     ah,09h
@@ -311,7 +310,7 @@ Tempo_Contador ENDP
 LE_TECLA	PROC
 sem_tecla:
 		cmp		nFich, 1
-		jne		sem_teclaMENU	;se estiver no menu nao mostra o contador
+		jne		sem_teclaMENU	;se estiver no menu/top10 nao mostra o contador
 
 		call 	Tempo_Contador
 		cmp 	Fim_Jogo,1
@@ -639,7 +638,7 @@ CICLO:		goto_xy	POSx,POSy		; Vai para nova possi��o
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 
 IMPRIME:	mov		ah, 02h
-			mov		dl, 190	; Coloca AVATAR
+			mov		dl, 190		; Coloca AVATAR
 			int		21H	
 			goto_xy	POSx,POSy	; Vai para posi��o do cursor
 		
@@ -652,6 +651,8 @@ IMPRIME:	mov		ah, 02h
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
+			cmp		al,13
+			je		ENTER_PRESS
 			jmp		LER_SETA
 
 				
@@ -671,6 +672,7 @@ ESTEND:		cmp 	al,48h
 
 BAIXO:		cmp		al,50h
 			jne		ENTER_PRESS
+			
 			inc 	POSy		;Baixo
 			inc 	POSy
 			mov 	teclapress,al
@@ -684,8 +686,13 @@ BAIXO:		cmp		al,50h
 			jmp		CICLO		
 
 ENTER_PRESS:
-			cmp		al,7Ah				;z
+			cmp		ah,0
+			jne		colocaAHa0
+			cmp		al,0Dh				;ENTER
+
 			jne		CICLO
+
+			
 
 			cmp		POSy, 7
 			je		mudaParaJogo
@@ -704,6 +711,10 @@ PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,50h
 			je		ESTEND
 
+
+colocaAHa0:
+			mov		ah, 0
+			jmp		ENTER_PRESS
 saltaParaJogo:
 			call	MenuJogoFunc
 
@@ -805,7 +816,7 @@ MenuSairFunc proc
 		call		LimpaSelecionado
 
 		mov			al, 83H
-		mov			bx, 3316
+		mov			bx, 1818
 		mov			cx,	6
 
 CicloSair:
@@ -842,7 +853,7 @@ LimpaSelecionado proc
 					loop		CicloLimpa2
 		;--
 		mov			al, 15
-		mov			bx, 3316	
+		mov			bx, 1818	
 		mov			cx,	6
 
 		CicloLimpa3:
