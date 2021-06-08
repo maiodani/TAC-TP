@@ -876,9 +876,8 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 
-		cmp			nFich, 3
-		je			SAIR
 
+CICLO_MAIN:
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH
@@ -889,8 +888,9 @@ Main  proc
 		;call		apaga_ecran
 		;goto_xy	0,0
 		;call 		Top10
+		cmp			nFich, 3
+		jne 		CICLO_MAIN
 
-SAIR:
 		mov			ah,4CH
 		INT			21H
 Main	endp
