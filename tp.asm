@@ -38,7 +38,7 @@ dseg	segment para public 'data'
         HandleFich      dw      0
         car_fich        db      ?
 
-		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10)
+		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10,3-sair)
 
 
 		string			db	"Teste pr�tico de T.I",0
@@ -108,7 +108,7 @@ IMP_FICH	PROC
 		cmp		nFich, 1
 		je		mudaJogo
 
-		cmp		nFich, 2
+		cmp		nFich, 3
 		je 		mudaSair
 inicio_imp:
 
@@ -876,7 +876,7 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 
-		cmp			nFich, 2
+		cmp			nFich, 3
 		je			SAIR
 
 		call		apaga_ecran
