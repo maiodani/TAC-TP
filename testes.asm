@@ -40,9 +40,8 @@ dseg	segment para public 'data'
         HandleFich      dw      0
         car_fich        db      ?
 
-		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10,3-sair)
+		nFich			db		1	;Saber qual .txt buscar (0-menu,1-jogo,2-top10,3-sair)
 
-		avisoMenu		db		0	;
 
 		string			db	"Teste pr�tico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecran 
@@ -107,10 +106,9 @@ IMP_FICH	PROC
 		je		mudaJogo
 
 		cmp		nFich, 2
-		je		mudaTop10
 
 		cmp		nFich, 3
-		je 		sai_f
+		je 		mudaSair
 inicio_imp:
         lea     dx,Fich
         int     21h
@@ -171,7 +169,9 @@ mudaTop10:
 		mov		Fich[3],'0'
 
 		jmp 	inicio_imp
-
+mudaSair:
+		RET
+		
 IMP_FICH	endp		
 
 
@@ -345,6 +345,8 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
+	mov 	al,Pontos
+	mov 	es:[100],al
 	mov 	al,String_num[6]	
 	goto_xy 30,0
 	MOSTRA	String_num
@@ -536,8 +538,6 @@ PROXIMO_NIVEL:
 			mov 	bl,num_car
 			mul 	bl
 			mov 	Pontos,ax
-			mov 	ax,es:[100]
-			mov 	es:[si],ax
 			inc		String_num[6]
 			cmp 	String_num[6],'6'
 			je		GANHAR
@@ -709,6 +709,7 @@ ENTER_PRESS:
 			cmp		ah,0
 			jne		colocaAHa0
 			cmp		al,0Dh				;ENTER
+
 			jne		CICLO
 
 			cmp		POSy, 7
@@ -742,6 +743,8 @@ saltaParaSair:
 
 mudaParaJogo:
 			mov 	nFich, 1
+			call	apaga_ecran
+			call	IMP_FICH
 			jmp		FIM
 
 mudaParaTop10:
@@ -749,9 +752,6 @@ mudaParaTop10:
 			call	apaga_ecran
 			call	IMP_FICH
 			jmp		FIM
-
-mudaParaSair:
-			mov		nFich, 3
 FIM:				
 			RET
 AVATAR_MENU		endp
@@ -775,16 +775,14 @@ Menu proc
 		cmp			POSy, 7
 		call		MenuJogoFunc
 
-verificaNFICH:
-		cmp			nFich, 0
-		jne			FIM_menu
-		
-		jmp 		Menu
+		cmp 		POSy, 9
+		call		MenuTop10Func
 
-FIM_menu:
+		cmp			POSy, 11
+		call		MenuSairFunc
+
 		RET		
 Menu endp
-
 
 MenuJogoFunc proc						;coloca [JOGAR] a cyan
 		cmp			POSy, 7
@@ -850,7 +848,7 @@ CicloSair:
 
 		call		AVATAR_MENU
 saltaJogo:
-		RET
+		call 		MenuJogoFunc
 			
 MenuSairFunc endp
 
@@ -902,30 +900,19 @@ INICIO_main:
 
 		goto_xy		0,0
 
-		cmp			nFich, 1
-		jne			main_jump
 		
 		call		apaga_ecran
 		call		IMP_FICH
 		call 		Nivel
 		call 		AVATAR
 		goto_xy		0,22
-		
-		goto_xy		0,0
-		
-
-
-
 		;call		apaga_ecran
 		;goto_xy	0,0
 		;call 		Top10
-		jmp FIM_main
+		
 main_jump:
 		cmp			nFich, 3
 		je			FIM_main	
-		
-		call		apaga_ecran
-		call		IMP_FICH
 
 		call		Menu
 		jmp 		INICIO_main
