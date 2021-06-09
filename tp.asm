@@ -20,7 +20,8 @@ dseg	segment para public 'data'
 		String_num 		db 		"Nivel:1$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
-		Pontos 			dw		0
+		String_Pontos 	db		'000$',0
+		Pontos 			dw		001000
 		num_car			db		0
 
 		pontuacao		db		"000$"			;pontuacao ate 999 (3 digitos)
@@ -342,8 +343,8 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
-	goto_xy 12, 23
-	MOSTRA 	pontuacao
+	goto_xy 70,0
+	MOSTRA 	String_Pontos
 	mov 	al,String_num[6]	
 	goto_xy 30,0
 	MOSTRA	String_num
@@ -359,9 +360,7 @@ Nivel	PROC
 	je		nivel5
 	
 nivel1:
-	mov		String_palavra[0],'I'
-	mov		String_palavra[1],'S'
-	mov		String_palavra[2],'E'
+
 	mov		String_palavra[3],'C'
 	mov		al,4
 	mov 	num_car,al
@@ -538,11 +537,15 @@ LER_SETA:	call 	LE_TECLA
 
 PROXIMO_NIVEL:
 			xor 	ax,ax
-			mov 	Pontos,0121
 			mov 	ax,Pontos
-			mov 	bx,100
-			mov		es:[bx],ah
-			mov		es:[bx+2],al
+			mov 	cx,3
+			mov 	bx,0
+			add		al,30h
+CICLO_PONTOS:	
+			
+			mov		String_Pontos[bx],al
+			inc 	bx
+			loop 	CICLO_PONTOS
 			inc		String_num[6]
 			cmp 	String_num[6],'6'
 			je		GANHAR
