@@ -21,8 +21,7 @@ dseg	segment para public 'data'
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
 		String_Pontos 	db		"000$"		;pontuacao ate 999 (3 digitos)
-		divisor			db 		10
-		Pontos 			dw		123
+		Pontos 			dw		000
 		num_car			db		0	
 		
 		String_menu		db		"       $"		;7 digitos
@@ -359,7 +358,9 @@ Nivel	PROC
 	je		nivel5
 	
 nivel1:
-
+	mov		String_palavra[0],'I'
+	mov		String_palavra[1],'S'
+	mov		String_palavra[2],'E'
 	mov		String_palavra[3],'C'
 	mov		al,4
 	mov 	num_car,al
@@ -442,11 +443,27 @@ Ciclo_Palavra:
 	goto_xy 10,21
 	MOSTRA String_game
 	mov 	car,' '
-	
+
+	add		Pontos,5
 
 Diferente:
 	inc		bx
 	loop Ciclo_Palavra
+
+	xor 	ax,ax
+	mov 	ax,Pontos
+	mov 	bx,2
+	mov 	cx,3
+	mov		dl,10
+CICLO_PONTOS:	
+	xor		ah,ah
+	div 	dl	
+	add 	ah,48
+	mov		String_Pontos[bx],ah
+	dec		bx
+	loop	CICLO_PONTOS
+	goto_xy 12,23
+	MOSTRA 	String_Pontos
 Sair_Palavra: RET
 Encontrar_Palavra	endp
 
@@ -535,20 +552,6 @@ LER_SETA:	call 	LE_TECLA
 			jmp		LER_SETA
 
 PROXIMO_NIVEL:
-			xor 	ax,ax
-			mov 	ax,Pontos
-			mov 	bx,2
-			mov 	cl,3
-
-CICLO_PONTOS:	
-			xor		ah,ah
-			div 	divisor	
-			add 	ah,48
-			
-			mov		String_Pontos[bx],ah
-			dec		bx
-			loop	CICLO_PONTOS
-
 			inc		String_num[6]
 			cmp 	String_num[6],'6'
 			je		GANHAR
