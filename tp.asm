@@ -368,6 +368,8 @@ nivel1:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
+	mov		POSx, 3			;posicao original
+	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel2:	
 	mov		String_palavra[0],'A'
@@ -379,6 +381,8 @@ nivel2:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
+	mov		POSx, 3			;posicao original
+	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel3:
 	mov		String_palavra[0],'B'
@@ -391,6 +395,8 @@ nivel3:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
+	mov		POSx, 3			;posicao original
+	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel4:
 	mov		String_palavra[0],'A'
@@ -406,6 +412,8 @@ nivel4:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
+	mov		POSx, 3			;posicao original
+	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
@@ -718,7 +726,7 @@ ENTER_PRESS:
 			je		mudaParaTop10
 
 			cmp		POSy, 11
-			je		FIM
+			je		mudaParaSair
 
 PAREDE:		mov 	al,50h				;baixo
 			cmp 	teclapress,48h
@@ -734,11 +742,14 @@ colocaAHa0:
 			jmp		ENTER_PRESS
 saltaParaJogo:
 			call	MenuJogoFunc
+			RET
 
 saltaParaTop10:
 			call	MenuTop10Func
+			RET
 saltaParaSair:
 			call	MenuSairFunc
+			RET
 
 mudaParaJogo:
 			mov 	nFich, 1
@@ -849,6 +860,7 @@ CicloSair:
 		loop		CicloSair
 
 		call		AVATAR_MENU
+		RET
 saltaJogo:
 		RET
 			
@@ -911,8 +923,6 @@ INICIO_main:
 		call 		AVATAR
 		goto_xy		0,22
 		
-		goto_xy		0,0
-		
 
 
 
@@ -928,8 +938,10 @@ main_jump:
 		call		IMP_FICH
 
 		call		Menu
+		
 		jmp 		INICIO_main
 FIM_main:
+		call		apaga_ecran
 		mov			ah,4CH
 		INT			21H
 Main	endp
