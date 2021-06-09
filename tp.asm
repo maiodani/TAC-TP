@@ -22,6 +22,8 @@ dseg	segment para public 'data'
 		String_game  	db	    "          $"	;10 digitos
 		Pontos 			dw		0
 		num_car			db		0
+
+		pontuacao		db		"000$"			;pontuacao ate 999 (3 digitos)
 		
 		String_menu		db		"       $"		;7 digitos
 
@@ -41,8 +43,6 @@ dseg	segment para public 'data'
         car_fich        db      ?
 
 		nFich			db		0	;Saber qual .txt buscar (0-menu,1-jogo,2-top10,3-sair)
-
-		avisoMenu		db		0	;
 
 		string			db	"Teste pr�tico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecran 
@@ -75,9 +75,6 @@ INT 21H
 ENDM
 
 ; FIM DAS MACROS
-
-
-
 
 
 ;ROTINA PARA APAGAR ECRAN
@@ -345,8 +342,8 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
-	goto_xy 70,0
-	MOSTRA 	Pontos
+	goto_xy 12, 23
+	MOSTRA 	pontuacao
 	mov 	al,String_num[6]	
 	goto_xy 30,0
 	MOSTRA	String_num
@@ -523,8 +520,8 @@ VERIFICA_CONCLUSAO:
 			mov 	cx,10
 			mov 	bx,0
 Ciclo_compara:
-			mov al, String_palavra[bx]
-			cmp al, String_game[bx]
+			mov 	al, String_palavra[bx]
+			cmp 	al, String_game[bx]
 			jne		LER_SETA
 			inc		bx
 			loop	Ciclo_compara
@@ -923,6 +920,7 @@ INICIO_main:
 		call 		AVATAR
 		goto_xy		0,22
 		
+		cmp			nFich, 2
 
 
 
@@ -936,7 +934,7 @@ main_jump:
 		
 		call		apaga_ecran
 		call		IMP_FICH
-
+		
 		call		Menu
 		
 		jmp 		INICIO_main
