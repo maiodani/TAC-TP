@@ -378,8 +378,6 @@ nivel1:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
-	mov		POSx, 3			;posicao original
-	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel2:	
 	mov		String_palavra[0],'A'
@@ -391,8 +389,6 @@ nivel2:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
-	mov		POSx, 3			;posicao original
-	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel3:
 	mov		String_palavra[0],'B'
@@ -405,8 +401,6 @@ nivel3:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
-	mov		POSx, 3			;posicao original
-	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel4:
 	mov		String_palavra[0],'A'
@@ -422,8 +416,6 @@ nivel4:
 	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
-	mov		POSx, 3			;posicao original
-	mov		POSy, 3
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
@@ -433,7 +425,10 @@ nivel5:
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
-Sair_Nivel: RET
+Sair_Nivel: 
+	mov		POSx, 3			;posicao original
+	mov		POSy, 3
+	RET
 Nivel	endp
 
 
@@ -567,10 +562,10 @@ LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
 
-		ESCAPE:
-			CMP 	AL, 27	; ESCAPE
-			JE		FIM
-			jmp		LER_SETA
+ESCAPE:
+	CMP 	AL, 27	; ESCAPE
+	JE		FIM
+	jmp		LER_SETA
 
 PROXIMO_NIVEL:
 			inc		String_num[6]
