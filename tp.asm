@@ -20,11 +20,9 @@ dseg	segment para public 'data'
 		String_num 		db 		"Nivel:1$"
         String_palavra  db	    "          $"	;10 digitos
 		String_game  	db	    "          $"	;10 digitos
-		String_Pontos 	db		'000$',0
+		String_Pontos 	db		'000$'			;pontuacao ate 999 (3 digitos)
 		Pontos 			dw		001000
-		num_car			db		0
-
-		pontuacao		db		"000$"			;pontuacao ate 999 (3 digitos)
+		num_car			db		0	
 		
 		String_menu		db		"       $"		;7 digitos
 
@@ -343,7 +341,7 @@ LE_TECLA	endp
 ; Niveis
 
 Nivel	PROC
-	goto_xy 70,0
+	goto_xy 12,23
 	MOSTRA 	String_Pontos
 	mov 	al,String_num[6]	
 	goto_xy 30,0
