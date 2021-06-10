@@ -1027,7 +1027,7 @@ INICIO_main:
 
 		cmp			nFich, 0
 		je			main_jump
-
+		
 
 		;call		apaga_ecran
 		;goto_xy	0,0
