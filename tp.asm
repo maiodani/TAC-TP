@@ -626,7 +626,7 @@ LER_SETA:	call 	LE_TECLA
 			je		ESTEND
 
 ESCAPE:
-			CMP 	AL, 27	; ESCAPE
+			CMP 	AL, 27	; ESCAPE<
 			JE		FIM
 			jmp		LER_SETA
 
