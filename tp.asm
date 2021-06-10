@@ -53,7 +53,20 @@ dseg	segment para public 'data'
 		POSxa			db	3	; Posi��o anterior de x
 		paredecar		db  32
 		teclapress		db  0
+
 		
+		;NÃO USADO POR FALTA DE TEMPO
+		buffer 			db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,10
+						db	'xxx-xxxxxxxxxx',13,108
+
 dseg	ends
 
 cseg	segment para public 'code'
@@ -91,6 +104,7 @@ apaga:		mov		byte ptr es:[bx],' '
 			loop	apaga
 			ret
 apaga_ecran	endp
+
 
 ;########################################################################
 ; IMP_FICH
@@ -183,6 +197,9 @@ mudaTop10:
 
 IMP_FICH	endp		
 
+
+
+;NÃO ACABADA POR FALTA DE TEMPO
 GUARDAR_FICH	PROC
 		;abre ficheiro
 
@@ -205,12 +222,11 @@ erro_abrir:
 ler_ciclo:
         mov     ah,40h
         mov     bx,HandleFich
-        mov     cx,1
-        mov     dx,"s"
+        mov     cx,200
+		LEA		dx,buffer
         int     21h
-		jc		erro_ler
-		cmp		ax,0		;EOF?
-		je		fecha_ficheiro
+        cmp	ax,cx		;EOF?
+        je	fecha_ficheiro
 
 erro_ler:
         mov     ah,09h
@@ -230,6 +246,9 @@ sai_f:
 		RET
 
 GUARDAR_FICH	endp	
+
+
+
 ;########################################################################
 ; Imprime o tempo no monitor
 Ler_TEMPO PROC	
@@ -637,7 +656,7 @@ Ciclo_reset:
 
 GANHAR:		goto_xy	60,20
 			MOSTRA	Fim_Ganhou
-			jmp 	FIM
+			ret
 
 ;label parede: faz o inverso (ex:caso haja uma parede na direita, o cursor após mover-se para a direita move-se para esquerda, invalidando o seu movimento, ficando na posição original)
 PAREDE:		mov 	al,50h				;baixo

@@ -35,10 +35,9 @@ erro_abrir:
 ler_ciclo:
         mov     ah,40h
         mov     bx,HandleFich
-        mov     cx,1
-        mov     dx,"s"
+        mov     cx,2
+        mov     dx,1
         int     21h
-        jc	erro_ler
         cmp	ax,0		;EOF?
         je	fecha_ficheiro
 
