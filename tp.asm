@@ -375,7 +375,7 @@ Perder:
 	MOSTRA	String_TJ
 	mov		al,1
 	mov 	Fim_Jogo,al
-	mov		Tempo_j,0
+	mov 	Tempo_j,0
 	jmp		fim_horas
 Tempo_Contador ENDP
 
@@ -888,7 +888,7 @@ Menu proc
 verificaNFICH:
 		cmp			nFich, 0
 		jne			FIM_menu
-		
+
 		jmp 		Menu
 
 FIM_menu:
@@ -1004,13 +1004,13 @@ LimpaSelecionado endp
 ;########################################################################
 ; MAIN
 Main  proc
-INICIO_main:
+
 		mov			ax, dseg
 		mov			ds,ax
 		
 		mov			ax,0B800h
 		mov			es,ax
-
+INICIO_main:
 		goto_xy		0,0
 		;call 		GUARDAR_FICH
 		cmp			nFich, 1
@@ -1022,6 +1022,17 @@ INICIO_main:
 		call 		AVATAR
 		goto_xy		0,22
 		
+		cmp			nFich, 2
+		je			main_jump
+
+		cmp			nFich, 0
+		je			main_jump
+
+
+		;call		apaga_ecran
+		;goto_xy	0,0
+		;call 		Top10
+		jmp			FIM_main
 
 main_jump:
 		cmp			nFich, 3
