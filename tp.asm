@@ -54,7 +54,7 @@ dseg	segment para public 'data'
 		paredecar		db  32
 		teclapress		db  0
 
-		
+
 		;NÃO USADO POR FALTA DE TEMPO
 		buffer 			db	'xxx-xxxxxxxxxx',13,10
 						db	'xxx-xxxxxxxxxx',13,10
@@ -440,8 +440,6 @@ nivel1:
 	mov		String_palavra[1],'S'
 	mov		String_palavra[2],'E'
 	mov		String_palavra[3],'C'
-	mov		al,4
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -451,8 +449,6 @@ nivel2:
 	mov		String_palavra[2],'R'
 	mov		String_palavra[3],'O'
 	mov		String_palavra[4],'Z'
-	mov		al,5
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -463,8 +459,6 @@ nivel3:
 	mov		String_palavra[3],'A'
 	mov		String_palavra[4],'T'
 	mov		String_palavra[5],'A'
-	mov		al,6
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
@@ -478,16 +472,20 @@ nivel4:
 	mov		String_palavra[6],'R'
 	mov		String_palavra[7],'R'
 	mov		String_palavra[8],'O'
-	mov		al,9
-	mov 	num_car,al
 	goto_xy 10,20
 	MOSTRA String_palavra	
 	jmp 	Sair_Nivel
 nivel5:
 	mov		String_palavra[0],'Z'
 	mov		String_palavra[1],'A'
-	mov		al,10
-	mov 	num_car,al
+	mov		String_palavra[2],'M'
+	mov		String_palavra[3],'B'
+	mov		String_palavra[4],'U'
+	mov		String_palavra[5],'J'
+	mov		String_palavra[6],'E'
+	mov		String_palavra[7],'I'
+	mov		String_palavra[8],'R'
+	mov		String_palavra[9],'O'
 	goto_xy 10,20
 	MOSTRA String_palavra
 	jmp 	Sair_Nivel
