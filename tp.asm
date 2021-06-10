@@ -38,7 +38,6 @@ dseg	segment para public 'data'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
         Fich         	db      'menu.TXT',0
-		Fich_escrever   db      'teste.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
 
@@ -200,52 +199,53 @@ IMP_FICH	endp
 
 
 ;NÃO ACABADA POR FALTA DE TEMPO
-GUARDAR_FICH	PROC
-		;abre ficheiro
 
-        mov     ah,3dh
-        mov     al,1
-inicio_imp:
-        lea     dx,Fich_escrever
-        int     21h
-        jc      erro_abrir
-        mov     HandleFich,ax
-        jmp     ler_ciclo
+;GUARDAR_FICH	PROC
+;		abre ficheiro
+;
+;       mov     ah,3dh
+;       mov     al,1
+;inicio_imp:
+;       lea     dx,Fich_escrever
+;       int     21h
+;       jc      erro_abrir
+;        mov     HandleFich,ax
+ ;       jmp     ler_ciclo
 
 	
-erro_abrir:
-        mov     ah,09h
-        lea     dx,Erro_Open
-        int     21h
-        jmp     sai_f
+;erro_abrir:
+ ;       mov     ah,09h
+  ;      lea     dx,Erro_Open
+   ;     int     21h
+    ;    jmp     sai_f
 
-ler_ciclo:
-        mov     ah,40h
-        mov     bx,HandleFich
-        mov     cx,200
-		LEA		dx,buffer
-        int     21h
-        cmp	ax,cx		;EOF?
-        je	fecha_ficheiro
+;ler_ciclo:
+ ;       mov     ah,40h
+  ;      mov     bx,HandleFich
+   ;     mov     cx,200
+	;	LEA		dx,buffer
+     ;   int     21h
+      ;  cmp	ax,cx		;EOF?
+       ; je	fecha_ficheiro
 
-erro_ler:
-        mov     ah,09h
-        lea     dx,Erro_Ler_Msg
-        int     21h
+;erro_ler:
+ ;       mov     ah,09h
+  ;      lea     dx,Erro_Ler_Msg
+   ;     int     21h
 
-fecha_ficheiro:
-        mov     ah,3eh
-        mov     bx,HandleFich
-        int     21h
-        jnc     sai_f
+;fecha_ficheiro:
+ ;       mov     ah,3eh
+  ;      mov     bx,HandleFich
+   ;     int     21h
+    ;    jnc     sai_f
 
-        mov     ah,09h
-        lea     dx,Erro_Close
-        Int     21h
-sai_f:	
-		RET
+     ;   mov     ah,09h
+      ;  lea     dx,Erro_Close
+       ; Int     21h
+;sai_f:	
+;		RET
 
-GUARDAR_FICH	endp	
+;GUARDAR_FICH	endp	
 
 
 
@@ -408,7 +408,8 @@ sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro
 		mov		ah,1
 SAI_TECLA:	RET
 
-SAIR_JOGO:	mov		al, 27	;tecla escape
+SAIR_JOGO:	mov		nFich, 2
+			mov 	AL, 27
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
 
@@ -1013,7 +1014,7 @@ INICIO_main:
 		mov			es,ax
 
 		goto_xy		0,0
-		call 		GUARDAR_FICH
+		;call 		GUARDAR_FICH
 		cmp			nFich, 1
 		jne			main_jump
 		
