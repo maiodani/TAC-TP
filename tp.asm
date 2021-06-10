@@ -109,7 +109,7 @@ apaga_ecran	endp
 ; IMP_FICH
 IMP_FICH	PROC
 		;abre ficheiro
-
+		goto_xy 0,0
         mov     ah,3dh
         mov     al,0
 
@@ -522,6 +522,8 @@ Diferente:
 	inc		bx
 	loop Ciclo_Palavra
 
+	
+
 	xor 	ax,ax
 	mov 	ax,Pontos
 	mov 	bx,2
@@ -645,8 +647,12 @@ Ciclo_reset:
 			mov 	String_TJ[1],' '
 			mov 	String_TJ[2],' '   
 			mov		Tempo_j,0
-			call		apaga_ecran
 			goto_xy		0,0
+			mov		POSx,3
+			mov		POSy,3
+			mov		POSxa,3
+			mov		POSya,3
+			call		apaga_ecran
 			call		IMP_FICH
 			call 	Nivel
 			jmp 	INICIO
