@@ -375,7 +375,8 @@ Perder:
 	MOSTRA	String_TJ
 	mov		al,1
 	mov 	Fim_Jogo,al
-	jmp 	fim_horas
+	mov		Tempo_j,0
+	jmp		fim_horas
 Tempo_Contador ENDP
 
 
@@ -409,7 +410,6 @@ sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro
 SAI_TECLA:	RET
 
 SAIR_JOGO:	mov		nFich, 2
-			mov 	AL, 27
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
 
@@ -550,8 +550,6 @@ INICIO:
 			mov		ax,0B800h
 			mov		es,ax
 
-			cmp		nFich, 2
-			je		LER_SETA
 
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h			; Guarda o Caracter que est� na posi��o do Cursor
@@ -622,15 +620,15 @@ Ciclo_compara:
 LER_SETA:	call 	LE_TECLA
 
 			cmp		nFich, 2
-			je 		ESCAPE
+			je 		FIM
 
 			cmp		ah, 1
 			je		ESTEND
 
 ESCAPE:
-	CMP 	AL, 27	; ESCAPE
-	JE		FIM
-	jmp		LER_SETA
+			CMP 	AL, 27	; ESCAPE
+			JE		FIM
+			jmp		LER_SETA
 
 PROXIMO_NIVEL:
 			inc		String_num[6]
@@ -1024,14 +1022,7 @@ INICIO_main:
 		call 		AVATAR
 		goto_xy		0,22
 		
-		cmp			nFich, 2
 
-
-
-		;call		apaga_ecran
-		;goto_xy	0,0
-		;call 		Top10
-		jmp FIM_main
 main_jump:
 		cmp			nFich, 3
 		je			FIM_main
