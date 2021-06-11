@@ -376,6 +376,9 @@ Perder:
 	mov		al,1
 	mov 	Fim_Jogo,al
 	mov 	Tempo_j,0
+	mov		String_TJ[0]," "
+	mov		String_TJ[1]," "
+	mov		String_TJ[2]," "
 	jmp		fim_horas
 Tempo_Contador ENDP
 
@@ -410,6 +413,7 @@ sem_teclaMENU:					;nao entra no sem_tecla, logo nao mostra o cronometro
 SAI_TECLA:	RET
 
 SAIR_JOGO:	mov		nFich, 2
+			mov 	Fim_Jogo,0
 			jmp 	SAI_TECLA	
 LE_TECLA	endp
 
